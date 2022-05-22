@@ -1,0 +1,40 @@
+{
+    "name": "sbsedv/paginator-bundle",
+    "description": "A Symfony ^6.0 bundle that streamlines pagination with Doctrine ORM.",
+    "type": "symfony-bundle",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Daniel Burger",
+            "homepage": "https://github.com/danielburger1337"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SBSEDV\\Bundle\\PaginatorBundle\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.0",
+        "doctrine/orm": "^2.10",
+        "symfony/framework-bundle": "^6.0",
+        "symfony/serializer": "^6.0"
+    },
+    "require-dev": {
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan": "^1.4",
+        "phpstan/phpstan-symfony": "^1.1",
+        "symfony/web-link": "^5.2 || ^6.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}
