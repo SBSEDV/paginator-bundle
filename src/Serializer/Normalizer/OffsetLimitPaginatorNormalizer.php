@@ -36,7 +36,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
      *
      * @param OffsetLimitPaginator<T> $object
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         $currentPage = self::calculatePage($object->getConfig()->getOffset(), $object->getConfig()->getLimit());
 
@@ -121,7 +121,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, ?string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof OffsetLimitPaginator;
     }
