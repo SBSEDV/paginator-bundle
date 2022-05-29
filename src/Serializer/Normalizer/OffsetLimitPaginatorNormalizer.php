@@ -27,7 +27,6 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         private UrlGeneratorInterface $urlGenerator,
         private readonly string $pageQueryParameter,
         private readonly string $limitQueryParameter,
-        private readonly string $lazyQueryParameter,
     ) {
     }
 
@@ -38,7 +37,11 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         $currentPage = self::calculatePage($object->getConfig()->getOffset(), $object->getConfig()->getLimit());
+
+        $totalPages = $object->getTotalPages();
 
         $data = [
             'items' => $this->normalizer->normalize($object->getData(), $format, $context),
@@ -46,58 +49,39 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
                 'current_page' => $currentPage,
                 'items_current_page' => $object->count(),
                 'items_per_page' => $object->getConfig()->getLimit(),
+                'total_pages' => $totalPages,
+                'total_items' => $object->getTotalCount(),
+                'more' => $totalPages > $currentPage,
+                '_links' => [
+                    'self' => [
+                        'href' => $this->generateUrl($request, $object, $context, $currentPage),
+                    ],
+                ],
             ],
         ];
 
-        // lazy paginators won't access the total count
-        // and therefor the COUNT(*) query will be skipped.
-        if ($object->getConfig()->getIsLazy()) {
-            $data['pagination']['more'] = $object->count() >= $object->getConfig()->getLimit();
-        } else {
-            $data['pagination']['total_pages'] = $object->getTotalPages(); // THIS access the "total count"
-            $data['pagination']['total_items'] = $object->getTotalCount(); // THIS causes another query
-            $data['pagination']['more'] = $object->getTotalPages() > $currentPage;
+        $totalPages = $object->getTotalPages();
+
+        if ($currentPage > 1) {
+            $data['pagination']['_links']['first'] = [
+                'href' => $this->generateUrl($request, $object, $context, 1),
+            ];
+
+            $prevPage = $currentPage <= $totalPages ? $currentPage - 1 : $totalPages;
+
+            $data['pagination']['_links']['previous'] = [
+                'href' => $this->generateUrl($request, $object, $context, $prevPage),
+            ];
         }
 
-        $request = $this->requestStack->getCurrentRequest();
+        if ($totalPages > $currentPage) {
+            $data['pagination']['_links']['next'] = [
+                'href' => $this->generateUrl($request, $object, $context, $currentPage + 1),
+            ];
 
-        $data['pagination']['_links'] = [
-            'self' => [
-                'href' => $this->generateUrl($request, $object, $context, $currentPage),
-            ],
-        ];
-
-        if (!$object->getConfig()->getIsLazy()) {
-            $currentPage = $currentPage;
-            $totalPages = $object->getTotalPages();
-
-            if ($currentPage > 1) {
-                $data['pagination']['_links']['first'] = [
-                    'href' => $this->generateUrl($request, $object, $context, 1),
-                ];
-
-                $prevPage = $currentPage <= $totalPages ? $currentPage - 1 : $totalPages;
-
-                $data['pagination']['_links']['previous'] = [
-                    'href' => $this->generateUrl($request, $object, $context, $prevPage),
-                ];
-            }
-
-            if ($totalPages > $currentPage) {
-                $data['pagination']['_links']['next'] = [
-                    'href' => $this->generateUrl($request, $object, $context, $currentPage + 1),
-                ];
-
-                $data['pagination']['_links']['last'] = [
-                    'href' => $this->generateUrl($request, $object, $context, $totalPages),
-                ];
-            }
-        } else {
-            if ($data['pagination']['more']) {
-                $data['pagination']['_links']['next'] = [
-                    'href' => $this->generateUrl($request, $object, $context, $currentPage + 1),
-                ];
-            }
+            $data['pagination']['_links']['last'] = [
+                'href' => $this->generateUrl($request, $object, $context, $totalPages),
+            ];
         }
 
         if (null !== $request && \class_exists(AddLinkHeaderListener::class)) {
@@ -147,7 +131,6 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         $params = $routeParams + ($context['_route_params'] ?? []) + $queryParams;
 
         $params[$this->limitQueryParameter] = $object->getConfig()->getLimit();
-        $params[$this->lazyQueryParameter] = $object->getConfig()->getIsLazy() ? 'true' : 'false';
         $params[$this->pageQueryParameter] = $page;
 
         return $this->urlGenerator->generate($routeName, $params, UrlGeneratorInterface::ABSOLUTE_URL);

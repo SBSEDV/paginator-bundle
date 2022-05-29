@@ -84,8 +84,6 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
      */
     public function filter(callable $cb, bool $preserveKeys = false): self
     {
-        $prevCount = $this->count();
-
         $filterd = \array_filter($this->getData(), $cb);
 
         if (!$preserveKeys) {
@@ -93,12 +91,6 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
         }
 
         $this->setData($filterd);
-
-        if ($prevCount > $this->count()) {
-            // the lazy check if "more" items are available
-            // will always return false if items have been removed
-            $this->getConfig()->setIsLazy(false);
-        }
 
         return $this;
     }

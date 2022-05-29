@@ -13,10 +13,8 @@ class PaginatorFactory
         private readonly string $pageQueryParameter,
         private readonly string $offsetQueryParameter,
         private readonly string $limitQueryParameter,
-        private readonly string $lazyQueryParameter,
         private readonly int $defaultLimit,
         private readonly int $maxLimit,
-        private readonly bool $defaultIsLazy,
     ) {
     }
 
@@ -28,14 +26,13 @@ class PaginatorFactory
      * If the specified limit is bigger than the maximum allowed limit,
      * the default limit is used.
      *
-     * @param OrmPaginator $paginator     The doctrine/orm paginator.
-     * @param Request      $request       The http-foundation request.
-     * @param int          $defaultPage   [optional] The default "page" used to calculate the OFFSET clause value.
-     * @param int          $defaultLimit  [optional] The default LIMIT clause value.
-     * @param int          $maxLimit      [optional] The maximum allowed value of the LIMIT clause.
-     * @param bool         $defaultIsLazy [optional] Whether the paginator is lazy by default.
+     * @param OrmPaginator $paginator    The doctrine/orm paginator.
+     * @param Request      $request      The http-foundation request.
+     * @param int          $defaultPage  [optional] The default "page" used to calculate the OFFSET clause value.
+     * @param int          $defaultLimit [optional] The default LIMIT clause value.
+     * @param int          $maxLimit     [optional] The maximum allowed value of the LIMIT clause.
      */
-    public function createOffsetLimitPaginatorFromRequest(OrmPaginator $paginator, Request $request, int $defaultPage = 1, ?int $defaultLimit = null, ?int $maxLimit = null, ?bool $defaultIsLazy = null, ?callable $modifyConfigCallable = null): OffsetLimitPaginator
+    public function createOffsetLimitPaginatorFromRequest(OrmPaginator $paginator, Request $request, int $defaultPage = 1, ?int $defaultLimit = null, ?int $maxLimit = null, ?callable $modifyConfigCallable = null): OffsetLimitPaginator
     {
         $defaultLimit ??= $this->defaultLimit;
 
@@ -64,9 +61,7 @@ class PaginatorFactory
             $offset = self::calculateOffset($page, $limit);
         }
 
-        $isLazy = $request->query->getBoolean($this->lazyQueryParameter, $defaultIsLazy ?? $this->defaultIsLazy);
-
-        $config = new OffsetLimitConfig($offset, $limit, $isLazy);
+        $config = new OffsetLimitConfig($offset, $limit);
 
         if (null !== $modifyConfigCallable) {
             \call_user_func_array($modifyConfigCallable, [&$config]);

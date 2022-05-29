@@ -6,8 +6,7 @@ final class OffsetLimitConfig
 {
     public function __construct(
         private int $offset,
-        private int $limit,
-        private bool $isLazy = false
+        private int $limit
     ) {
     }
 
@@ -47,26 +46,6 @@ final class OffsetLimitConfig
     public function setLimit(int $limit): self
     {
         $this->limit = $limit;
-
-        return $this;
-    }
-
-    /**
-     * Get whether the paginator is lazy.
-     */
-    public function getIsLazy(): bool
-    {
-        return $this->isLazy;
-    }
-
-    /**
-     * Set whether the paginator is lazy.
-     *
-     * @param bool $isLazy Whether the paginator is lazy.
-     */
-    public function setIsLazy(bool $isLazy): self
-    {
-        $this->isLazy = $isLazy;
 
         return $this;
     }
