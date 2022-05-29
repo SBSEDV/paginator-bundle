@@ -1,6 +1,6 @@
 {
     "name": "sbsedv/paginator-bundle",
-    "description": "A Symfony ^6.0 bundle that streamlines pagination with Doctrine ORM.",
+    "description": "A Symfony ^6.1 bundle that streamlines pagination with Doctrine ORM.",
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
