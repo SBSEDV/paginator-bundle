@@ -69,7 +69,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
 
             $prevPage = $currentPage <= $totalPages ? $currentPage - 1 : $totalPages;
 
-            $data['pagination']['_links']['previous'] = [
+            $data['pagination']['_links']['prev'] = [
                 'href' => $this->generateUrl($request, $object, $context, $prevPage),
             ];
         }
