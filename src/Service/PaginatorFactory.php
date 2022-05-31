@@ -5,16 +5,15 @@ namespace SBSEDV\Bundle\PaginatorBundle\Service;
 use Doctrine\ORM\Tools\Pagination\Paginator as OrmPaginator;
 use SBSEDV\Bundle\PaginatorBundle\OffsetLimit\OffsetLimitConfig;
 use SBSEDV\Bundle\PaginatorBundle\OffsetLimit\OffsetLimitPaginator;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class PaginatorFactory
 {
     public function __construct(
-        private readonly string $pageQueryParameter,
-        private readonly string $offsetQueryParameter,
-        private readonly string $limitQueryParameter,
-        private readonly int $defaultLimit,
-        private readonly int $maxLimit,
+        private readonly string $queryParameter,
+        private readonly int $defaultPageSize,
+        private readonly int $defaultMaxPageSize,
     ) {
     }
 
@@ -34,16 +33,25 @@ class PaginatorFactory
      */
     public function createOffsetLimitPaginatorFromRequest(OrmPaginator $paginator, Request $request, int $defaultPage = 1, ?int $defaultLimit = null, ?int $maxLimit = null, ?callable $modifyConfigCallable = null): OffsetLimitPaginator
     {
-        $defaultLimit ??= $this->defaultLimit;
+        $defaultLimit ??= $this->defaultPageSize;
 
-        $limit = $request->query->getInt($this->limitQueryParameter, $defaultLimit);
-        if ($limit < 1 || $limit > ($maxLimit ?? $this->maxLimit)) {
+        $pageBag = new InputBag($request->query->all($this->queryParameter));
+
+        if ($pageBag->has('size')) {
+            $limit = $pageBag->getInt('size');
+        } elseif ($pageBag->has('limit')) {
+            $limit = $pageBag->getInt('limit');
+        } else {
+            $limit = $defaultLimit;
+        }
+
+        if ($limit < 1 || $limit > ($maxLimit ?? $this->defaultMaxPageSize)) {
             $limit = $defaultLimit;
         }
 
         $offset = null;
-        if ($request->query->has($this->offsetQueryParameter)) {
-            $offset = $request->query->getInt($this->offsetQueryParameter);
+        if ($pageBag->has('offset')) {
+            $offset = $pageBag->getInt('offset');
 
             if ($offset < 0) {
                 // basically if an invalid offset (a negative one) was provided,
@@ -51,7 +59,7 @@ class PaginatorFactory
                 $offset = self::calculateOffset($defaultPage, $limit);
             }
         } else {
-            $page = $request->query->getInt($this->pageQueryParameter, $defaultPage);
+            $page = $pageBag->getInt('number', $defaultPage);
 
             // negative pages can not exist
             if ($page < 1) {

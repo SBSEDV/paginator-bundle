@@ -25,8 +25,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
     public function __construct(
         private RequestStack $requestStack,
         private UrlGeneratorInterface $urlGenerator,
-        private readonly string $pageQueryParameter,
-        private readonly string $limitQueryParameter,
+        private readonly string $queryParameter,
     ) {
     }
 
@@ -43,6 +42,8 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
 
         $totalPages = $object->getTotalPages();
 
+        $hasMore = $totalPages > $currentPage;
+
         $data = [
             'items' => $this->normalizer->normalize($object->getData(), $format, $context),
             'pagination' => [
@@ -51,7 +52,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
                 'items_per_page' => $object->getConfig()->getLimit(),
                 'total_pages' => $totalPages,
                 'total_items' => $object->getTotalCount(),
-                'more' => $totalPages > $currentPage,
+                'more' => $hasMore,
                 '_links' => [
                     'self' => [
                         'href' => $this->generateUrl($request, $object, $context, $currentPage),
@@ -74,7 +75,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
             ];
         }
 
-        if ($totalPages > $currentPage) {
+        if ($hasMore) {
             $data['pagination']['_links']['next'] = [
                 'href' => $this->generateUrl($request, $object, $context, $currentPage + 1),
             ];
@@ -125,13 +126,13 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
     {
         $routeName = $context['_route'] ?? $request?->attributes->get('_route') ?? throw new \LogicException('You must provide the "_route" context in non http-foundation applications.');
 
-        $routeParams = $request->attributes->all('_route_params');
+        $routeParams = $request?->attributes->all('_route_params') ?? [];
         $queryParams = $context['_query_params'] ?? $request?->query->all() ?? [];
 
         $params = $routeParams + ($context['_route_params'] ?? []) + $queryParams;
 
-        $params[$this->limitQueryParameter] = $object->getConfig()->getLimit();
-        $params[$this->pageQueryParameter] = $page;
+        $params[$this->queryParameter]['size'] = $object->getConfig()->getLimit();
+        $params[$this->queryParameter]['number'] = $page;
 
         return $this->urlGenerator->generate($routeName, $params, UrlGeneratorInterface::ABSOLUTE_URL);
     }

@@ -15,8 +15,7 @@ class SBSEDVPaginatorBundle extends AbstractBundle
      */
     public function configure(DefinitionConfigurator $definition): void
     {
-        $definition->import('../config/definitions/default_values.php');
-        $definition->import('../config/definitions/query_parameters.php');
+        $definition->import('../config/definitions.php');
     }
 
     /**
@@ -25,9 +24,7 @@ class SBSEDVPaginatorBundle extends AbstractBundle
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $container->parameters()
-            ->set('sbsedv_paginator.query_params.page', $config['query_parameters']['page'])
-            ->set('sbsedv_paginator.query_params.offset', $config['query_parameters']['offset'])
-            ->set('sbsedv_paginator.query_params.limit', $config['query_parameters']['limit'])
+            ->set('sbsedv_paginator.query_parameter', $config['query_parameter'])
         ;
 
         $container->import('../config/services/factory.php');
@@ -35,8 +32,8 @@ class SBSEDVPaginatorBundle extends AbstractBundle
 
         $container->services()
             ->get(PaginatorFactory::class)
-            ->arg('$defaultLimit', $config['default_values']['limit'])
-            ->arg('$maxLimit', $config['default_values']['max_limit'])
+            ->arg('$defaultPageSize', $config['default_page_size'])
+            ->arg('$defaultMaxPageSize', $config['default_max_page_size'])
         ;
     }
 }

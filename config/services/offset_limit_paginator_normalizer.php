@@ -12,9 +12,7 @@ return function (ContainerConfigurator $container): void {
             ->args([
                 '$requestStack' => service(RequestStack::class),
                 '$urlGenerator' => service(UrlGeneratorInterface::class),
-
-                '$pageQueryParameter' => param('sbsedv_paginator.query_params.page'),
-                '$limitQueryParameter' => param('sbsedv_paginator.query_params.limit'),
+                '$queryParameter' => param('sbsedv_paginator.query_parameter'),
             ])
             ->tag('serializer.normalizer')
     ;
