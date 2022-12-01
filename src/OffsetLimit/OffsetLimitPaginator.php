@@ -23,7 +23,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
     ) {
         $query = $this->paginator->getQuery();
 
-        if (null === $query->getFirstResult()) {
+        if (0 === $query->getFirstResult() || null === $query->getFirstResult()) {
             $query->setFirstResult($config->getOffset());
         }
 
