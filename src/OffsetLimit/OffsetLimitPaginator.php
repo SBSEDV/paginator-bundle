@@ -124,7 +124,9 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
      */
     public function getTotalPages(): int
     {
-        return (int) \ceil($this->getTotalCount() / $this->getConfig()->getLimit());
+        $totalPages = (int) \ceil($this->getTotalCount() / $this->getConfig()->getLimit());
+
+        return $totalPages === 0 ? 1 : $totalPages;
     }
 
     /**
