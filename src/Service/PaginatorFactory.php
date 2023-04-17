@@ -25,11 +25,15 @@ class PaginatorFactory
      * If the specified limit is bigger than the maximum allowed limit,
      * the default limit is used.
      *
-     * @param OrmPaginator $paginator    The doctrine/orm paginator.
-     * @param Request      $request      The http-foundation request.
-     * @param int          $defaultPage  [optional] The default "page" used to calculate the OFFSET clause value.
-     * @param int          $defaultLimit [optional] The default LIMIT clause value.
-     * @param int          $maxLimit     [optional] The maximum allowed value of the LIMIT clause.
+     * @template T of object
+     *
+     * @param OrmPaginator<T> $paginator    The doctrine/orm paginator.
+     * @param Request         $request      The http-foundation request.
+     * @param int             $defaultPage  [optional] The default "page" used to calculate the OFFSET clause value.
+     * @param int             $defaultLimit [optional] The default LIMIT clause value.
+     * @param int             $maxLimit     [optional] The maximum allowed value of the LIMIT clause.
+     *
+     * @return OffsetLimitPaginator<T>
      */
     public function createOffsetLimitPaginatorFromRequest(OrmPaginator $paginator, Request $request, int $defaultPage = 1, ?int $defaultLimit = null, ?int $maxLimit = null, ?callable $modifyConfigCallable = null): OffsetLimitPaginator
     {

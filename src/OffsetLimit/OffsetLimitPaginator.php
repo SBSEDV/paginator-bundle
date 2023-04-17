@@ -81,6 +81,8 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
      *
      * @param callable $cb           The filter function.
      * @param bool     $preserveKeys [optional] Whether to preserve the original array keys.
+     *
+     * @return self<T>
      */
     public function filter(callable $cb, bool $preserveKeys = false): self
     {
