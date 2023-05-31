@@ -111,6 +111,13 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         return true;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            OffsetLimitPaginator::class => __CLASS__ === static::class,
+        ];
+    }
+
     /**
      * @param OffsetLimitPaginator<T> $object
      */
