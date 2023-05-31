@@ -36,17 +36,11 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
         $this->updateIterator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return $this->iterator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->count;

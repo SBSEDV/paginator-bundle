@@ -35,7 +35,7 @@ class PaginatorFactory
      *
      * @return OffsetLimitPaginator<T>
      */
-    public function createOffsetLimitPaginatorFromRequest(OrmPaginator $paginator, Request $request, int $defaultPage = 1, ?int $defaultLimit = null, ?int $maxLimit = null, ?callable $modifyConfigCallable = null): OffsetLimitPaginator
+    public function createOffsetLimitPaginatorFromRequest(OrmPaginator $paginator, Request $request, int $defaultPage = 1, int $defaultLimit = null, int $maxLimit = null, callable $modifyConfigCallable = null): OffsetLimitPaginator
     {
         $defaultLimit ??= $this->defaultPageSize;
 

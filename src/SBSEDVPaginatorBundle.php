@@ -10,17 +10,11 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class SBSEDVPaginatorBundle extends AbstractBundle
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configure(DefinitionConfigurator $definition): void
     {
         $definition->import('../config/definitions.php');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $container->parameters()
