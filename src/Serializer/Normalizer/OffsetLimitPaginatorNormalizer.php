@@ -7,7 +7,6 @@ use SBSEDV\Bundle\PaginatorBundle\OffsetLimit\OffsetLimitPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -18,7 +17,7 @@ use Symfony\Component\WebLink\Link;
 /**
  * @template T of object
  */
-class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
+class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use NormalizerAwareTrait;
 
@@ -104,11 +103,6 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof OffsetLimitPaginator;
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        return true;
     }
 
     public function getSupportedTypes(?string $format): array
