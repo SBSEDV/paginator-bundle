@@ -2,28 +2,30 @@
 
 namespace SBSEDV\Bundle\PaginatorBundle\OffsetLimit;
 
-use Doctrine\ORM\Tools\Pagination\Paginator as OrmPaginator;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @template T of object
+ *
+ * @implements \IteratorAggregate<array-key, T>
  */
 final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @phpstan-ignore-line
 {
-    private array $data;
-    private \Traversable $iterator;
-    private int $count;
+    private ?int $count = null;
+
+    private readonly \IteratorIterator $iterator;
 
     /**
-     * @param \Doctrine\ORM\Tools\Pagination\Paginator<T> $paginator The doctrine/orm paginator.
-     * @param OffsetLimitConfig                           $config    The paginator configuration object used.
+     * @param Paginator<T>      $paginator The doctrine/orm paginator.
+     * @param OffsetLimitConfig $config    The paginator configuration.
      */
     public function __construct(
-        private readonly OrmPaginator $paginator, // @phpstan-ignore-line
+        private readonly Paginator $paginator, // @phpstan-ignore-line
         private readonly OffsetLimitConfig $config
     ) {
         $query = $this->paginator->getQuery();
 
-        if (0 === $query->getFirstResult() || null === $query->getFirstResult()) {
+        if (0 === $query->getFirstResult()) {
             $query->setFirstResult($config->getOffset());
         }
 
@@ -31,76 +33,40 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
             $query->setMaxResults($config->getLimit());
         }
 
-        $this->data = \iterator_to_array($this->paginator);
-
-        $this->updateIterator();
+        $this->iterator = new \IteratorIterator($this->paginator);
     }
 
+    /**
+     * @return \Traversable<T>
+     */
     public function getIterator(): \Traversable
     {
         return $this->iterator;
     }
 
-    public function count(): int
-    {
-        return $this->count;
-    }
-
     /**
-     * The current page data.
-     *
-     * @return T[]
+     * @return Paginator<T>
      */
-    public function getData(): array
-    {
-        return $this->data;
-    }
-
-    /**
-     * Update the current page data.
-     *
-     * @param T[] $data The current page data.
-     */
-    public function setData(array $data): self // @phpstan-ignore-line
-    {
-        $this->data = $data;
-
-        $this->updateIterator();
-
-        return $this;
-    }
-
-    /**
-     * Apply a filter function to each element.
-     *
-     * @param callable $cb           The filter function.
-     * @param bool     $preserveKeys [optional] Whether to preserve the original array keys.
-     *
-     * @return self<T>
-     */
-    public function filter(callable $cb, bool $preserveKeys = false): self
-    {
-        $filterd = \array_filter($this->getData(), $cb);
-
-        if (!$preserveKeys) {
-            $filterd = \array_values($filterd);
-        }
-
-        $this->setData($filterd);
-
-        return $this;
-    }
-
-    /**
-     * The doctrine/orm paginator.
-     */
-    public function getOrmPaginator(): OrmPaginator // @phpstan-ignore-line
+    public function getPaginator(): Paginator
     {
         return $this->paginator;
     }
 
     /**
-     * The paginator info object used to create this paginator.
+     * The total amount of items on the current pagination page.
+     */
+    public function count(): int
+    {
+        if (null === $this->count) {
+            $count = \count(\iterator_to_array($this->iterator));
+            $this->count = $count;
+        }
+
+        return $this->count;
+    }
+
+    /**
+     * The configuration used to create this paginated query.
      */
     public function getConfig(): OffsetLimitConfig
     {
@@ -108,7 +74,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
     }
 
     /**
-     * The total amount of items that this paginator can find.
+     * The total amount of items that this pagination query can find.
      */
     public function getTotalCount(): int
     {
@@ -116,22 +82,12 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
     }
 
     /**
-     * The total amount of pages that this paginator handles.
+     * The total amount of pages that this pagination query can find.
      */
     public function getTotalPages(): int
     {
         $totalPages = (int) \ceil($this->getTotalCount() / $this->getConfig()->getLimit());
 
         return $totalPages === 0 ? 1 : $totalPages;
-    }
-
-    /**
-     * Update the internal iterator.
-     */
-    private function updateIterator(): void
-    {
-        $this->iterator = new \ArrayIterator($this->data);
-
-        $this->count = \count($this->data);
     }
 }

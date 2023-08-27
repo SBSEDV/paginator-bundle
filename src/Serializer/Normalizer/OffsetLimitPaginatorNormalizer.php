@@ -47,7 +47,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         $hasMore = $totalPages > $currentPage;
 
         $data = [
-            'items' => $this->normalizer->normalize($object->getData(), $format, $context),
+            'items' => $this->normalizer->normalize($object->getIterator(), $format, $context),
             'pagination' => [
                 'current_page' => $currentPage,
                 'items_current_page' => $object->count(),
@@ -113,7 +113,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
     public function getSupportedTypes(?string $format): array
     {
         return [
-            OffsetLimitPaginator::class => __CLASS__ === static::class,
+            OffsetLimitPaginator::class => true,
         ];
     }
 
