@@ -21,6 +21,11 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
 {
     use NormalizerAwareTrait;
 
+    final public const CONTEXT_ROUTE = '_route';
+    final public const CONTEXT_ROUTE_PARAMS = '_route_params';
+    final public const CONTEXT_QUERY_PARAMS = '_query_params';
+    final public const CONTEXT_URL_REFERENCE_TYPE = '_url_reference_type';
+
     public function __construct(
         private RequestStack $requestStack,
         private UrlGeneratorInterface $urlGenerator,
@@ -117,17 +122,17 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
      */
     private function generateUrl(?Request $request, OffsetLimitPaginator $object, array $context, int $page): string
     {
-        $routeName = $context['_route'] ?? $request?->attributes->get('_route') ?? throw new \LogicException('You must provide the "_route" context in non http-foundation applications.');
+        $routeName = $context[self::CONTEXT_ROUTE] ?? $request?->attributes->get('_route') ?? throw new \LogicException('You must provide the "_route" context in non http-foundation applications.');
 
-        $routeParams = $request?->attributes->all('_route_params') ?? [];
-        $queryParams = $context['_query_params'] ?? $request?->query->all() ?? [];
+        $routeParams = $request?->attributes->all(self::CONTEXT_ROUTE_PARAMS) ?? [];
+        $queryParams = $context[self::CONTEXT_QUERY_PARAMS] ?? $request?->query->all() ?? [];
 
-        $params = $routeParams + ($context['_route_params'] ?? []) + $queryParams;
+        $params = $routeParams + $queryParams + ($context[self::CONTEXT_ROUTE_PARAMS] ?? []);
 
         $params[$this->queryParameter]['size'] = $object->getConfig()->getLimit();
         $params[$this->queryParameter]['number'] = $page;
 
-        return $this->urlGenerator->generate($routeName, $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($routeName, $params, $context[self::CONTEXT_URL_REFERENCE_TYPE] ?? UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**
