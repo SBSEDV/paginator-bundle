@@ -13,6 +13,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
 {
     private ?int $count = null;
 
+    /** @var \IteratorIterator<array-key, T, Paginator<T>> */
     private readonly \IteratorIterator $iterator;
 
     /**
@@ -37,7 +38,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
     }
 
     /**
-     * @return \Traversable<T>
+     * @return \Traversable<array-key, T>
      */
     public function getIterator(): \Traversable
     {
