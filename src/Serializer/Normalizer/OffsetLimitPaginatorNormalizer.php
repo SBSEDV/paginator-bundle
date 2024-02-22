@@ -35,8 +35,10 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
 
     /**
      * @param OffsetLimitPaginator<T> $object
+     *
+     * @return array<string, mixed>
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -105,7 +107,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         return $data;
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof OffsetLimitPaginator;
     }
@@ -119,10 +121,19 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
 
     /**
      * @param OffsetLimitPaginator<T> $object
+     * @param array<string, mixed>    $context
      */
     private function generateUrl(?Request $request, OffsetLimitPaginator $object, array $context, int $page): string
     {
         $routeName = $context[self::CONTEXT_ROUTE] ?? $request?->attributes->get('_route') ?? throw new \LogicException('You must provide the "_route" context in non http-foundation applications.');
+        if (!\is_string($routeName)) {
+            throw new \InvalidArgumentException(\sprintf('The route name must be of type string, %s given.', \get_debug_type($routeName)));
+        }
+
+        $referenceType = $context[self::CONTEXT_URL_REFERENCE_TYPE] ?? UrlGeneratorInterface::ABSOLUTE_URL;
+        if (!\is_int($referenceType)) {
+            throw new \InvalidArgumentException(\sprintf('The url reference type must be of type int, %s given.', \get_debug_type($referenceType)));
+        }
 
         $routeParams = $request?->attributes->all(self::CONTEXT_ROUTE_PARAMS) ?? [];
         $queryParams = $context[self::CONTEXT_QUERY_PARAMS] ?? $request?->query->all() ?? [];
@@ -132,7 +143,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         $params[$this->queryParameter]['size'] = $object->getConfig()->getLimit();
         $params[$this->queryParameter]['number'] = $page;
 
-        return $this->urlGenerator->generate($routeName, $params, $context[self::CONTEXT_URL_REFERENCE_TYPE] ?? UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($routeName, $params, $referenceType);
     }
 
     /**
