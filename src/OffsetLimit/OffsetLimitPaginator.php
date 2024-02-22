@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  *
  * @implements \IteratorAggregate<array-key, T>
  */
-final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @phpstan-ignore-line
+final class OffsetLimitPaginator implements \IteratorAggregate, \Countable
 {
     private ?int $count = null;
 
@@ -21,7 +21,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable // @p
      * @param OffsetLimitConfig $config    The paginator configuration.
      */
     public function __construct(
-        private readonly Paginator $paginator, // @phpstan-ignore-line
+        private readonly Paginator $paginator,
         private readonly OffsetLimitConfig $config
     ) {
         $query = $this->paginator->getQuery();
