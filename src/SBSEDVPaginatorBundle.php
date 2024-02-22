@@ -15,6 +15,9 @@ class SBSEDVPaginatorBundle extends AbstractBundle
         $definition->import('../config/definitions.php');
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $container->parameters()
