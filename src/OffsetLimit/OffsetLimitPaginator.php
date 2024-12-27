@@ -22,7 +22,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable
      */
     public function __construct(
         private readonly Paginator $paginator,
-        private readonly OffsetLimitConfig $config
+        private readonly OffsetLimitConfig $config,
     ) {
         $query = $this->paginator->getQuery();
 

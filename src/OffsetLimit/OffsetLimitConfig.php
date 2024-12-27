@@ -6,7 +6,7 @@ final class OffsetLimitConfig
 {
     public function __construct(
         private int $offset,
-        private int $limit
+        private int $limit,
     ) {
     }
 
