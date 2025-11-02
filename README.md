@@ -1,4 +1,4 @@
-[![PHPStan](https://github.com/SBSEDV/paginator-bundle/actions/workflows/phpstan.yml/badge.svg)](https://github.com/SBSEDV/paginator-bundle/actions/workflows/phpstan.yml)
+[![PHPStan](https://github.com/SBSEDV/paginator-bundle/actions/workflows/phpstan.yaml/badge.svg)](https://github.com/SBSEDV/paginator-bundle/actions/workflows/phpstan.yaml)
 
 # sbsedv/paginator-bundle
 
