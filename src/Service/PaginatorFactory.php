@@ -90,7 +90,7 @@ class PaginatorFactory
      *
      * @return int The database OFFSET clause value.
      */
-    private static function calculateOffset(int $page, int $limit = 150): int
+    private static function calculateOffset(int $page, int $limit): int
     {
         return ($page * $limit) - $limit;
     }
