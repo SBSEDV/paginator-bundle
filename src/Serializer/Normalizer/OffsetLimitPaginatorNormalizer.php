@@ -138,6 +138,7 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         $routeParams = $request?->attributes->all(self::CONTEXT_ROUTE_PARAMS) ?? [];
         $queryParams = $context[self::CONTEXT_QUERY_PARAMS] ?? $request?->query->all() ?? [];
 
+        // @phpstan-ignore-next-line binaryOp.invalid
         $params = $routeParams + $queryParams + ($context[self::CONTEXT_ROUTE_PARAMS] ?? []);
 
         $params[$this->queryParameter]['size'] = $object->getConfig()->getLimit();

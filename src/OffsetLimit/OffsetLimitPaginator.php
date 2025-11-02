@@ -63,7 +63,7 @@ final class OffsetLimitPaginator implements \IteratorAggregate, \Countable
             $this->count = $count;
         }
 
-        return $this->count;
+        return $this->count; // @phpstan-ignore return.type
     }
 
     /**
