@@ -90,12 +90,10 @@ class OffsetLimitPaginatorNormalizer implements NormalizerInterface, NormalizerA
         }
 
         if (null !== $request && \class_exists(AddLinkHeaderListener::class)) {
-            if (!($request->attributes->get('_links') instanceof EvolvableLinkProviderInterface)) {
-                $request->attributes->set('_links', new GenericLinkProvider());
-            }
-
-            /** @var EvolvableLinkProviderInterface $linkProvider */
             $linkProvider = $request->attributes->get('_links');
+            if (!$linkProvider instanceof EvolvableLinkProviderInterface) {
+                $linkProvider = new GenericLinkProvider();
+            }
 
             foreach ($data['pagination']['_links'] as $key => $value) {
                 $linkProvider = $linkProvider->withLink(new Link($key, $value['href']));
